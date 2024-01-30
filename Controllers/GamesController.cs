@@ -22,7 +22,7 @@ namespace RelationsNaN.Controllers
         // GET: Games
         public async Task<IActionResult> Index()
         {
-            var relationsNaNContext = _context.Game.Include(g => g.Genre);
+            var relationsNaNContext = _context.Game.Include(g => g.Genre).Include(p => p.Platforms);
             return View(await relationsNaNContext.ToListAsync());
         }
 
@@ -83,6 +83,7 @@ namespace RelationsNaN.Controllers
                 return NotFound();
             }
             ViewData["GenreId"] = new SelectList(_context.Bundle, "Id", "Name", game.GenreId);
+            ViewBag.Platforms = new SelectList(_context.Platform, "Id", "Name", game.Platforms);
             return View(game);
         }
 
@@ -119,6 +120,7 @@ namespace RelationsNaN.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GenreId"] = new SelectList(_context.Bundle, "Id", "Name", game.GenreId);
+            ViewBag.Platforms = new SelectList(_context.Platform, "Id", "Name", game.Platforms);
             return View(game);
         }
 
@@ -164,5 +166,40 @@ namespace RelationsNaN.Controllers
         {
           return (_context.Game?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        public async Task<IActionResult> AddPlatform(int id, int platformID)
+        {
+            if (_context.Game == null)
+            {
+                return Problem("Entity set 'RelationsNaNContext.Game'  is null.");
+            }
+            var game = await _context.Game.FindAsync(id);
+            var platform = await _context.Platform.FindAsync(platformID);
+            if (game != null )
+            {
+                game.Platforms.Add(platform);
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> RemovePlatform(int id, int platformID)
+        {
+            if (_context.Game == null)
+            {
+                return Problem("Entity set 'RelationsNaNContext.Game'  is null.");
+            }
+            var game = await _context.Game.FindAsync(id);
+            var platform = await _context.Platform.FindAsync(platformID);
+            if (game != null)
+            {
+                game.Platforms.Remove(platform);
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
     }
 }
