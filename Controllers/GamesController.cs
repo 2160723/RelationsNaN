@@ -83,7 +83,8 @@ namespace RelationsNaN.Controllers
                 return NotFound();
             }
             ViewData["GenreId"] = new SelectList(_context.Bundle, "Id", "Name", game.GenreId);
-            ViewBag.Platforms = new SelectList(_context.Platform, "Id", "Name", game.Platforms);
+            ViewData["Platforms"] = new SelectList(_context.Platform.Where(x => !game.Platforms.Contains(x)), "Id", "Name");
+            //ViewBag.Platforms = new SelectList(_context.Platform, "Id", "Name", game.Platforms);
             return View(game);
         }
 
@@ -120,7 +121,7 @@ namespace RelationsNaN.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GenreId"] = new SelectList(_context.Bundle, "Id", "Name", game.GenreId);
-            ViewBag.Platforms = new SelectList(_context.Platform, "Id", "Name", game.Platforms);
+            ViewData["Platforms"] = new SelectList(_context.Platform.Where(x => !game.Platforms.Contains(x)), "Id", "Name");
             return View(game);
         }
 
